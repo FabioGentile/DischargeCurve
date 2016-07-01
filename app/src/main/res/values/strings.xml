@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DischargeCurve</string>
+    <string name="LogFileName">sdcard/batt_stat.log</string>
+    <string name="LogFilePath">/storage/extSdCard/batt_stat.log</string>
 </resources>
