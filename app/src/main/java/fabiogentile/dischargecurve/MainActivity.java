@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         File logFile = new File(getString(R.string.LogFileName));
         try {
             if (!logFile.exists()) {
-                if (logFile.createNewFile() == false)
+                if (!logFile.createNewFile())
                     Log.e(TAG, "impossibile creare il file");
             }
 
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
-            int scale = -1;
             int level = -1;
             int voltage = -1;
             int temp = -1;
@@ -44,10 +43,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                //scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
                 temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
                 voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-                Log.e(TAG, "level is " + level + ", temp is " + temp + ", voltage is " + voltage);
+                Log.i(TAG, "level is " + level + ", temp is " + temp + ", voltage is " + voltage);
                 appendLog(level + " " + voltage + " " + temp);
             }
         };
@@ -61,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public void appendLog(String text) {
         File logFile = new File(getString(R.string.LogFilePath));
         String currDate =
-                android.text.format.DateFormat.format("dd/MM/yyyy hh:mm:ss", new java.util.Date()).toString();
+                android.text.format.DateFormat.format("dd/MM/yyyy HH:mm:ss", new java.util.Date()).toString();
 
         //BufferedWriter for performance, true to set append to file flag
         BufferedWriter buf;
