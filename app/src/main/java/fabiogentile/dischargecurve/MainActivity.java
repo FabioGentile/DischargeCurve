@@ -9,14 +9,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
-    private final String TAG = "AppTest";
+    private final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
                 level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                 temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
                 voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-                Log.i(TAG, "level is " + level + ", temp is " + temp + ", voltage is " + voltage);
-                appendLog(level + " " + voltage + " " + temp);
+
+                new FileLogger().execute(level, voltage, temp);
             }
         };
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -55,23 +53,4 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "App creata");
     }
 
-
-    public void appendLog(String text) {
-        File logFile = new File(getString(R.string.LogFilePath));
-        String currDate =
-                android.text.format.DateFormat.format("dd/MM/yyyy HH:mm:ss", new java.util.Date()).toString();
-
-        //BufferedWriter for performance, true to set append to file flag
-        BufferedWriter buf;
-        try {
-            buf = new BufferedWriter(new FileWriter(logFile, true));
-            String strToLog = "[" + currDate + "] " + text;
-            buf.append(strToLog);
-            buf.newLine();
-            buf.flush();
-            buf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
