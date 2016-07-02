@@ -7,11 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -55,28 +56,35 @@ public class ServiceDC extends IntentService {
                 level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                 temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
                 voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-                if (Build.VERSION.SDK_INT > 20)
-                    current = BatteryManager.BATTERY_PROPERTY_CURRENT_NOW;
 
-                //MyLogger.execute(level, voltage, temp);
+                try {
+
+                    File currentFile = new File(getString(R.string.CurrentFile));
+
+                    //Controllo che il file della corrente esista
+                    if (currentFile.exists()) {
+                        FileReader fReader = new FileReader(currentFile);
+                        BufferedReader bufferedReader = new BufferedReader(fReader);
+                        current = Integer.parseInt(bufferedReader.readLine());
+                    } else
+                        current = 0;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    current = 0;
+                }
+
                 LogToFile(level, temp, voltage, current);
             }
         };
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-
         registerReceiver(batteryReceiver, filter);
 
+        // Se viene chiuso si ricrea automaticamente
         return Service.START_STICKY;
-    }
-
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            Log.i(TAG, "onHandleIntent: Successo qualcosa");
-
-        }
     }
 
     @Override
@@ -87,13 +95,18 @@ public class ServiceDC extends IntentService {
             unregisterReceiver(batteryReceiver);
     }
 
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        Log.e(TAG, "onHandleIntent: QUALCOSA");
+    }
+
 
     private void LogToFile(Integer level, Integer temp, Integer voltage, Integer current) {
-        File logFile = new File("/storage/extSdCard/batt_stat.log");
+        File logFile = new File(getString(R.string.LogFileName));
         String currDate =
                 android.text.format.DateFormat.format("dd/MM/yyyy kk:mm:ss", new java.util.Date()).toString();
 
-        String text = level + " " + voltage + " " + ((float) temp / 10.0) + " " + current;
+        String text = level + " " + voltage + " " + ((float) temp / 10.0) + " " + ((float) current / 1000.0);
         Log.i(TAG, "[" + currDate + "] " + text);
 
         //BufferedWriter for performance, true to set append to file flag
