@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 
 public class FileLogger extends AsyncTask<Integer, Void, Void> {
-    private final String TAG = "FileLogger";
+    private final String TAG = "LogToFile";
 
     protected Void doInBackground(Integer... params) {
         int level = params[0];
